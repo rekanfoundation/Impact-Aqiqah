@@ -1,0 +1,67 @@
+{
+  "name": "IA — Dispatch Outbox (WA/Email)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "minutes", "minutesInterval": 5 }] }
+      },
+      "id": "cron-1",
+      "name": "Cron 5 Menit",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.IA_APP_URL}}/api/internal/notifications/dispatch",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-webhook-secret", "value": "={{$env.IA_WEBHOOK_SECRET}}" }
+          ]
+        }
+      },
+      "id": "dispatch-1",
+      "name": "Ambil Outbox (sent)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.items",
+        "options": {}
+      },
+      "id": "split-1",
+      "name": "Split Items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [800, 300]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            { "conditions": { "options": {}, "combinator": "and", "conditions": [
+              { "leftValue": "={{$json.channel}}", "rightValue": "whatsapp", "operator": { "type": "string", "operation": "equals" } } ] }, "outputKey": "whatsapp" },
+            { "conditions": { "options": {}, "combinator": "and", "conditions": [
+              { "leftValue": "={{$json.channel}}", "rightValue": "email", "operator": { "type": "string", "operation": "equals" } } ] }, "outputKey": "email" }
+          ]
+        }
+      },
+      "id": "switch-1",
+      "name": "Per Channel",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1060, 300]
+    }
+  ],
+  "connections": {
+    "Cron 5 Menit": { "main": [[{ "node": "Ambil Outbox (sent)", "type": "main", "index": 0 }]] },
+    "Ambil Outbox (sent)": { "main": [[{ "node": "Split Items", "type": "main", "index": 0 }]] },
+    "Split Items": { "main": [[{ "node": "Per Channel", "type": "main", "index": 0 }]] }
+  },
+  "settings": {},
+  "_comment": "Node WhatsApp/Email ditambahkan sesuai provider: WA dari payload.wa_link, Email pakai payload.subject + link."
+}

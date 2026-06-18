@@ -1,0 +1,56 @@
+{
+  "name": "IA — Reminders (SLA)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "hours", "hoursInterval": 1 }] }
+      },
+      "id": "cron-1",
+      "name": "Cron Tiap Jam",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/rpc/enqueue_due_reminders",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        }
+      },
+      "id": "rpc-1",
+      "name": "RPC enqueue_due_reminders",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.IA_APP_URL}}/api/internal/notifications/dispatch",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-webhook-secret", "value": "={{$env.IA_WEBHOOK_SECRET}}" }
+          ]
+        }
+      },
+      "id": "dispatch-1",
+      "name": "Dispatch Outbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [800, 300]
+    }
+  ],
+  "connections": {
+    "Cron Tiap Jam": { "main": [[{ "node": "RPC enqueue_due_reminders", "type": "main", "index": 0 }]] },
+    "RPC enqueue_due_reminders": { "main": [[{ "node": "Dispatch Outbox", "type": "main", "index": 0 }]] }
+  },
+  "settings": {}
+}
