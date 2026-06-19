@@ -43,5 +43,9 @@ begin
       using (bucket_id = 'public-assets')
     $p$;
   end if;
+exception when others then
+  -- Beberapa operasi storage butuh role khusus (supabase_storage_admin).
+  -- Bila ditolak, jangan gagalkan migrasi — buat bucket/policy via dashboard Storage.
+  raise notice 'Storage setup tidak lengkap (atur via dashboard): %', sqlerrm;
 end
 $$;
