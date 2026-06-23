@@ -20,6 +20,7 @@ export interface ReportData {
   animals_distributed: number;
   distributions: Array<{ recipient: string | null; area: string | null; packages: number }>;
   media: Array<{ type: string; stage: string; caption: string | null }>;
+  narrative?: string | null;
 }
 
 const s = StyleSheet.create({
@@ -31,6 +32,7 @@ const s = StyleSheet.create({
   label: { width: 110, color: "#666" },
   value: { flex: 1 },
   item: { marginBottom: 2 },
+  narrative: { marginBottom: 12, fontSize: 11, lineHeight: 1.5, color: "#333", fontStyle: "italic" },
   footer: { marginTop: 28, fontSize: 9, color: "#888", borderTop: "1 solid #eee", paddingTop: 8 },
 });
 
@@ -40,6 +42,8 @@ export function ReportDocument({ data }: { data: ReportData }) {
       <Page size="A4" style={s.page}>
         <Text style={s.brand}>ImpactAqiqah</Text>
         <Text style={s.tagline}>Tunaikan Ibadah, Tebarkan Manfaat — Laporan Pelaksanaan</Text>
+
+        {data.narrative ? <Text style={s.narrative}>{data.narrative}</Text> : null}
 
         <View style={s.row}>
           <Text style={s.label}>Nomor Order</Text>

@@ -67,9 +67,39 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["manager_program", "admin_cabang"],
   },
   {
+    href: "/distribution",
+    label: "Distribusi",
+    glyph: "🗺️",
+    roles: ["direktur", "manager_program", "admin_pusat", "admin_cabang"],
+  },
+  {
+    href: "/ai-analyses",
+    label: "Analisis AI",
+    glyph: "🧠",
+    roles: ["direktur", "manager_program", "admin_pusat"],
+  },
+  {
     href: "/programs",
     label: "Program",
     glyph: "🗂️",
+    roles: ["manager_program"],
+  },
+  {
+    href: "/landing",
+    label: "Landing CMS",
+    glyph: "🖼️",
+    roles: ["manager_program"],
+  },
+  {
+    href: "/ai-assistant",
+    label: "AI Assistant",
+    glyph: "🤖",
+    roles: ["manager_program"],
+  },
+  {
+    href: "/users",
+    label: "Akun & Broadcast",
+    glyph: "👤",
     roles: ["manager_program"],
   },
   {

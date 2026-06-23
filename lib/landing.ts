@@ -6,5 +6,6 @@ export function waUrl(text: string): string {
   return buildWaLink(WA_NUMBER, text);
 }
 
+// WA hanya untuk konsultasi/bantuan. Pemesanan & pembayaran lewat sistem (checkout website).
 export const WA_DEFAULT_TEXT =
-  "Halo ImpactAqiqah, saya ingin konsultasi & memesan layanan aqiqah.";
+  "Halo ImpactAqiqah, saya ingin berkonsultasi tentang layanan aqiqah.";

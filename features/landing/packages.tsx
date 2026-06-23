@@ -4,7 +4,7 @@ import { hasilSummary, nasiBoxItems } from "@/lib/packages";
 import type { Service } from "@/types/db";
 
 function buyHref(id: string) {
-  return `/daftar?paket=${id}`;
+  return `/checkout?paket=${id}`;
 }
 
 const SectionTitle = ({ title, subtitle }: { title: string; subtitle?: string }) => (

@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { waUrl, WA_DEFAULT_TEXT } from "@/lib/landing";
+import type { LandingMediaItem } from "@/lib/landing-media-defaults";
 
 const SectionTitle = ({
   eyebrow,
@@ -22,7 +24,7 @@ const SectionTitle = ({
   </div>
 );
 
-export function Hero() {
+export function Hero({ image }: { image?: LandingMediaItem | null }) {
   return (
     <section className="bg-[var(--surface)]">
       <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
@@ -61,10 +63,23 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Hero image placeholder */}
+        {/* Hero image (dikelola Super Admin via CMS) */}
         <div className="relative">
-          <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-gradient-to-br from-amber-200 via-orange-200 to-emerald-200 text-6xl shadow-sm">
-            🍛
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-sm">
+            {image ? (
+              <Image
+                src={image.url}
+                alt={image.alt}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center bg-gradient-to-br from-amber-200 via-orange-200 to-emerald-200 text-6xl">
+                🍛
+              </div>
+            )}
           </div>
           <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-xl bg-white/95 px-3 py-2 shadow">
             <span className="text-[var(--color-accent)]">★</span>
@@ -115,7 +130,15 @@ export function Why() {
   );
 }
 
-export function Gallery() {
+function Frame({ img, sizes, className = "" }: { img: LandingMediaItem; sizes: string; className?: string }) {
+  return (
+    <div className={`relative overflow-hidden rounded-2xl bg-neutral-100 ${className}`}>
+      <Image src={img.url} alt={img.alt} fill loading="lazy" sizes={sizes} className="object-cover" />
+    </div>
+  );
+}
+
+export function Gallery({ images = [] }: { images?: LandingMediaItem[] }) {
   return (
     <section id="galeri" className="bg-[var(--surface)]">
       <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6">
@@ -123,15 +146,133 @@ export function Gallery() {
           title="Galeri ImpactAqiqah"
           subtitle="Lihat proses aqiqah yang dilakukan secara syar'i, higienis, dan profesional."
         />
-        <div className="grid gap-3 sm:grid-cols-2">
-          {["🐐", "🍢"].map((g, i) => (
-            <div
-              key={i}
-              className="flex aspect-video items-center justify-center rounded-2xl bg-gradient-to-br from-neutral-200 to-neutral-300 text-5xl"
-            >
-              {g}
+        {images.length === 0 ? (
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="aspect-video rounded-2xl bg-neutral-200" />
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Grid 3 kolom (desktop) */}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {images.slice(0, 3).map((img) => (
+                <Frame key={img.id ?? img.url} img={img} sizes="(max-width:1024px) 50vw, 33vw" className="aspect-video" />
+              ))}
             </div>
-          ))}
+            {/* Carousel swipe-friendly (semua gambar, rasio 16:9) */}
+            <div className="mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
+              {images.map((img) => (
+                <Frame
+                  key={`c-${img.id ?? img.url}`}
+                  img={img}
+                  sizes="288px"
+                  className="aspect-video w-72 flex-none snap-start"
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </section>
+  );
+}
+
+export function AnimalSection({ image }: { image?: LandingMediaItem | null }) {
+  if (!image) return null;
+  return (
+    <section className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6">
+      <div className="grid items-center gap-10 lg:grid-cols-2">
+        <Frame img={image} sizes="(max-width:1024px) 100vw, 50vw" className="aspect-[4/3]" />
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-primary)]">Hewan Aqiqah</span>
+          <h2 className="mt-1 text-3xl font-bold tracking-tight text-neutral-900">Kambing Sehat &amp; Syar&apos;i</h2>
+          <p className="mt-3 text-neutral-600">
+            Setiap kambing dipilih dengan teliti — sehat, cukup umur, dan memenuhi syarat sah aqiqah.
+            Penyembelihan dilakukan oleh tim ahli sesuai syariat Islam.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function FoodSection({ olahan, nasiBox }: { olahan?: LandingMediaItem | null; nasiBox?: LandingMediaItem | null }) {
+  if (!olahan && !nasiBox) return null;
+  return (
+    <section className="bg-[var(--surface)]">
+      <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6">
+        <SectionTitle
+          eyebrow="Pengolahan"
+          title="Olahan Lezat &amp; Higienis"
+          subtitle="Dimasak koki berpengalaman di dapur higienis — sate, gulai, hingga nasi box siap santap."
+        />
+        <div className="grid gap-4 md:grid-cols-2">
+          {olahan && (
+            <figure>
+              <Frame img={olahan} sizes="(max-width:768px) 100vw, 50vw" className="aspect-video" />
+              <figcaption className="mt-2 text-center text-sm text-neutral-500">Olahan kambing aqiqah</figcaption>
+            </figure>
+          )}
+          {nasiBox && (
+            <figure>
+              <Frame img={nasiBox} sizes="(max-width:768px) 100vw, 50vw" className="aspect-video" />
+              <figcaption className="mt-2 text-center text-sm text-neutral-500">Paket nasi box</figcaption>
+            </figure>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function CertificateSection({ image }: { image?: LandingMediaItem | null }) {
+  if (!image) return null;
+  return (
+    <section className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6">
+      <div className="grid items-center gap-10 lg:grid-cols-2">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-primary)]">Transparansi</span>
+          <h2 className="mt-1 text-3xl font-bold tracking-tight text-neutral-900">Sertifikat &amp; Laporan Aqiqah</h2>
+          <p className="mt-3 text-neutral-600">
+            Anda menerima sertifikat dan laporan dokumentasi pelaksanaan — dari penyembelihan hingga
+            distribusi — sebagai bukti amanah yang transparan.
+          </p>
+        </div>
+        <Frame img={image} sizes="(max-width:1024px) 100vw, 50vw" className="aspect-[4/3] bg-white" />
+      </div>
+    </section>
+  );
+}
+
+export function PartnersSection({ partners = [] }: { partners?: LandingMediaItem[] }) {
+  if (partners.length === 0) return null;
+  return (
+    <section className="bg-[var(--surface)]">
+      <div className="mx-auto max-w-[1280px] px-4 py-14 sm:px-6">
+        <p className="mb-6 text-center text-sm font-semibold uppercase tracking-wider text-neutral-500">
+          Partner &amp; Kolaborasi
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-8">
+          {partners.map((p) => {
+            const logo = (
+              <Image
+                src={p.url}
+                alt={p.alt}
+                width={160}
+                height={64}
+                loading="lazy"
+                className="h-12 w-auto object-contain opacity-80 transition hover:opacity-100"
+              />
+            );
+            return p.link_url ? (
+              <a key={p.id ?? p.url} href={p.link_url} target="_blank" rel="noopener noreferrer">
+                {logo}
+              </a>
+            ) : (
+              <span key={p.id ?? p.url}>{logo}</span>
+            );
+          })}
         </div>
       </div>
     </section>

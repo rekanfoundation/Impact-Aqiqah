@@ -37,3 +37,13 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* Sembunyikan launcher Tawk.to di mobile agar tidak menutupi floating dock.
+   Tawk me-render iframe (z-index hampir maksimum) di <body>; di mobile chat
+   cukup lewat tombol WA pada dock. Tetap tampil di desktop. */
+@media (max-width: 767px) {
+  body > iframe[title*="chat" i],
+  iframe[title*="chat widget" i] {
+    display: none !important;
+  }
+}

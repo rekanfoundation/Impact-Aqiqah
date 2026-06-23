@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { requireCustomer } from "@/server/auth/session";
 import { signOut } from "@/app/(auth)/login/actions";
-import { TawkTo } from "@/features/integrations/tawk-to";
 
 const NAV = [
   { href: "/akun", label: "Pesanan Saya" },
@@ -41,7 +40,6 @@ export default async function AkunLayout({
         </nav>
       </header>
       <main className="mx-auto max-w-4xl px-4 py-6">{children}</main>
-      <TawkTo />
     </div>
   );
 }

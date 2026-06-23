@@ -17,7 +17,7 @@ interface PublicReport {
   animals_distributed: number;
   distributions: Array<{ recipient: string | null; area: string | null; packages: number }>;
   media: Array<{ type: string; stage: string; caption: string | null; path: string }>;
-  report: { pdf_path: string | null; version: number } | null;
+  report: { pdf_path: string | null; version: number; narrative: string | null } | null;
 }
 
 export default async function PublicReportPage({
@@ -59,6 +59,12 @@ export default async function PublicReportPage({
       <div className="rounded-2xl border border-neutral-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-neutral-800">Laporan Pelaksanaan</h2>
         <p className="mb-4 text-sm text-neutral-500">{r.order_number}</p>
+
+        {r.report?.narrative && (
+          <p className="mb-4 rounded-lg bg-amber-50 p-3 text-sm italic text-neutral-700">
+            {r.report.narrative}
+          </p>
+        )}
 
         <dl className="grid grid-cols-[120px_1fr] gap-y-1 text-sm">
           <dt className="text-neutral-500">Atas Nama</dt>

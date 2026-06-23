@@ -3,8 +3,15 @@ import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { KpiCard } from "@/features/dashboard/kpi-card";
 import { OpenOrdersTable } from "@/features/dashboard/open-orders-table";
 import { AiPanel } from "@/features/dashboard/ai-panel";
+import {
+  SlaBreachesCard,
+  OfficerLoadCard,
+  TrendsCard,
+  AlertFeedCard,
+} from "@/features/dashboard/monitoring";
 import { requireProfile } from "@/server/auth/session";
 import { getBranchKpi, getOpenOrders, summarize } from "@/server/db/dashboard";
+import { getSlaBreaches, getOfficerLoad, getTrends, getAlertFeed } from "@/server/db/monitoring";
 import { isCentralRole, ROLE_LABELS } from "@/types/auth";
 
 export const metadata = { title: "Dashboard" };
@@ -16,9 +23,13 @@ export default async function DashboardPage() {
   // Non-pusat dibatasi ke cabangnya (defense in depth; RLS juga membatasi).
   const branchFilter = central ? undefined : profile.branch_id ?? undefined;
 
-  const [kpiRows, openOrders] = await Promise.all([
+  const [kpiRows, openOrders, sla, officers, trends, alerts] = await Promise.all([
     getBranchKpi(branchFilter),
     getOpenOrders(50),
+    getSlaBreaches(branchFilter),
+    getOfficerLoad(),
+    getTrends(14, branchFilter),
+    getAlertFeed(12),
   ]);
   const sum = summarize(kpiRows);
 
@@ -45,6 +56,18 @@ export default async function DashboardPage() {
 
       {/* AI Executive Summary & Risk (Phase 2) — role pusat */}
       {central && <AiPanel />}
+
+      {/* Advanced Monitoring (Phase 2): tren, SLA, beban petugas, kendala — ter-scope RLS */}
+      <section className="grid gap-6 lg:grid-cols-2">
+        <div className="lg:col-span-2">
+          <TrendsCard data={trends} />
+        </div>
+        <SlaBreachesCard data={sla} />
+        <OfficerLoadCard data={officers} />
+        <div className="lg:col-span-2">
+          <AlertFeedCard data={alerts} />
+        </div>
+      </section>
 
       {/* Litmus test: order belum selesai + lokasi + PIC + kendala */}
       <Card>
