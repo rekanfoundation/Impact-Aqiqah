@@ -20,7 +20,8 @@ export async function getBranches(): Promise<Branch[]> {
   return (data ?? []) as Branch[];
 }
 
-const SERVICE_COLS = "id, type, name, description, price, meta, is_active";
+const SERVICE_COLS =
+  "id, type, name, slug, description, price, vendor_price, margin, sort_order, meta, is_active";
 
 export async function getServices(): Promise<Service[]> {
   const supabase = await createClient();
@@ -30,6 +31,7 @@ export async function getServices(): Promise<Service[]> {
     .eq("is_active", true)
     .is("deleted_at", null)
     .order("type")
+    .order("sort_order")
     .order("price");
   return (data ?? []) as Service[];
 }
@@ -42,6 +44,7 @@ export async function getAllServices(): Promise<Service[]> {
     .select(SERVICE_COLS)
     .is("deleted_at", null)
     .order("type")
+    .order("sort_order")
     .order("price");
   return (data ?? []) as Service[];
 }

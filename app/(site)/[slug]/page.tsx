@@ -2,20 +2,38 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCmsPageBySlug, getFaqs } from "@/server/db/cms";
-import { getPublicPackages, splitPackages } from "@/server/db/public";
+import { getPublicPackages, splitPackages, getServiceBySlug } from "@/server/db/public";
 import { getLandingMedia } from "@/server/db/landing-media";
 import { renderMarkdown } from "@/lib/markdown";
 import { KambingPackages, NasiBoxPackages } from "@/features/landing/packages";
 import { Gallery } from "@/features/landing/sections";
 import { FaqView } from "@/features/cms/faq-view";
-import { BreadcrumbJsonLd, FaqJsonLd } from "@/features/seo/json-ld";
+import { ProgramDetail } from "@/features/programs/program-detail";
+import { BreadcrumbJsonLd, FaqJsonLd, ProductJsonLd } from "@/features/seo/json-ld";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const page = await getCmsPageBySlug(slug);
-  if (!page) return { title: "Halaman tidak ditemukan" };
+  if (!page) {
+    // Fallback: halaman detail program.
+    const svc = await getServiceBySlug(slug);
+    if (svc) {
+      return {
+        title: { absolute: `${svc.name} — ImpactAqiqah` },
+        description: svc.description || `Paket ${svc.name} ImpactAqiqah.`,
+        alternates: { canonical: `/${svc.slug}` },
+        openGraph: {
+          title: svc.name,
+          description: svc.description || undefined,
+          url: `/${svc.slug}`,
+          type: "website",
+        },
+      };
+    }
+    return { title: "Halaman tidak ditemukan" };
+  }
 
   const title = page.seo_title || page.title;
   const description = page.seo_description || undefined;
@@ -45,7 +63,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CmsPage({ params }: Props) {
   const { slug } = await params;
   const page = await getCmsPageBySlug(slug);
-  if (!page) notFound();
+
+  // Fallback: halaman detail program (docs/28).
+  if (!page) {
+    const svc = await getServiceBySlug(slug);
+    if (!svc) notFound();
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+        <BreadcrumbJsonLd
+          items={[
+            { name: "Beranda", path: "/" },
+            { name: "Paket", path: "/paket" },
+            { name: svc.name, path: `/${svc.slug}` },
+          ]}
+        />
+        <ProductJsonLd name={svc.name} description={svc.description} price={svc.price} slug={svc.slug || svc.id} />
+        <nav className="mb-3 text-sm text-neutral-400">
+          <Link href="/" className="hover:text-neutral-700">Beranda</Link>
+          <span className="mx-1.5">/</span>
+          <Link href="/paket" className="hover:text-neutral-700">Paket</Link>
+          <span className="mx-1.5">/</span>
+          <span className="text-neutral-600">{svc.name}</span>
+        </nav>
+        <h1 className="text-3xl font-bold text-neutral-900">{svc.name}</h1>
+        <ProgramDetail service={svc} />
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">

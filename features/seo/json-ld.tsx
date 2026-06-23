@@ -75,6 +75,39 @@ export function BreadcrumbJsonLd({ items }: { items: { name: string; path: strin
   );
 }
 
+export function ProductJsonLd({
+  name,
+  description,
+  price,
+  slug,
+}: {
+  name: string;
+  description?: string | null;
+  price: number;
+  slug: string;
+}) {
+  const base = appUrl();
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name,
+        description: description || undefined,
+        url: `${base}/${slug}`,
+        brand: { "@type": "Brand", name: SITE_NAME },
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "IDR",
+          price: String(price),
+          availability: "https://schema.org/InStock",
+          url: `${base}/${slug}`,
+        },
+      }}
+    />
+  );
+}
+
 export function FaqJsonLd({ items }: { items: { question: string; answer: string }[] }) {
   if (items.length === 0) return null;
   return (
