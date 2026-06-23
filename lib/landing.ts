@@ -1,6 +1,8 @@
 import { buildWaLink } from "@/lib/wa";
+import { whatsappNumber } from "@/lib/site";
 
-export const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER || "6281234567890";
+// docs/27: utamakan NEXT_PUBLIC_WHATSAPP_NUMBER, fallback NEXT_PUBLIC_WA_NUMBER.
+export const WA_NUMBER = whatsappNumber();
 
 export function waUrl(text: string): string {
   return buildWaLink(WA_NUMBER, text);

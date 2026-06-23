@@ -47,3 +47,50 @@ html {
     display: none !important;
   }
 }
+
+/* Konten CMS (Markdown → HTML) — styling prose ringan tanpa plugin. docs/27 */
+.cms-prose {
+  color: #404040;
+  line-height: 1.7;
+}
+.cms-prose h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #171717;
+  margin: 1.6rem 0 0.6rem;
+}
+.cms-prose h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #262626;
+  margin: 1.2rem 0 0.4rem;
+}
+.cms-prose p {
+  margin: 0.7rem 0;
+}
+.cms-prose ul,
+.cms-prose ol {
+  margin: 0.7rem 0;
+  padding-left: 1.4rem;
+  list-style: revert;
+}
+.cms-prose li {
+  margin: 0.3rem 0;
+}
+.cms-prose a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+.cms-prose strong {
+  color: #171717;
+  font-weight: 600;
+}
+.cms-prose img {
+  border-radius: 0.75rem;
+  margin: 1rem 0;
+  max-width: 100%;
+}
+.cms-prose hr {
+  margin: 1.5rem 0;
+  border-color: #e5e5e5;
+}
