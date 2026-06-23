@@ -1,7 +1,30 @@
 import { createClient } from "@/lib/supabase/server";
 import type { BranchKpiRow, OpenOrderRow } from "@/types/db";
+import { DEFAULT_SLA, type SlaSettings } from "@/server/ai";
 
 // Sumber data dashboard: views KPI (docs/05 §7, docs/09).
+
+/**
+ * Baca ambang SLA (jam) dari app_settings. Fallback ke DEFAULT_SLA bila baris hilang.
+ * Dipakai Risk Detector untuk menandai order yang lewat SLA.
+ */
+export async function getSlaSettings(): Promise<SlaSettings> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("app_settings")
+    .select("key, value")
+    .in("key", ["sla_documentation_hours", "sla_distribution_hours", "sla_report_hours"]);
+
+  const rows = (data ?? []) as Array<{ key: string; value: { hours?: number } | null }>;
+  const hours = (key: string, fallback: number) =>
+    rows.find((r) => r.key === key)?.value?.hours ?? fallback;
+
+  return {
+    documentation: hours("sla_documentation_hours", DEFAULT_SLA.documentation),
+    distribution: hours("sla_distribution_hours", DEFAULT_SLA.distribution),
+    report: hours("sla_report_hours", DEFAULT_SLA.report),
+  };
+}
 
 export async function getBranchKpi(branchId?: string): Promise<BranchKpiRow[]> {
   const supabase = await createClient();

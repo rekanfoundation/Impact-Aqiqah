@@ -4,11 +4,13 @@ import { NextResponse, type NextRequest } from "next/server";
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
 // Route publik (tanpa login). Laporan peserta: /r/{token} (docs/11, docs/15).
-const PUBLIC_PATHS = ["/", "/login", "/daftar"];
+const PUBLIC_PATHS = ["/", "/login", "/daftar", "/checkout"];
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) return true;
   if (pathname.startsWith("/r/")) return true; // laporan publik bertoken
+  if (pathname.startsWith("/checkout")) return true; // checkout guest + halaman sukses
+  if (pathname.startsWith("/api/chat")) return true; // chatbot publik (docs/26)
   return false;
 }
 

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SwRegister } from "@/features/pwa/sw-register";
+import { ChatWidget } from "@/features/chatbot/chat-widget";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
         <SwRegister />
+        <ChatWidget />
       </body>
     </html>
   );

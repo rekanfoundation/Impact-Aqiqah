@@ -31,7 +31,7 @@ export function SiteHeader() {
             <span aria-hidden>💬</span> WhatsApp
           </a>
           <a
-            href="#paket"
+            href="/checkout"
             className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-primary-dark)]"
           >
             Order Now
@@ -48,7 +48,7 @@ export function WhatsAppFab() {
       href={waUrl(WA_DEFAULT_TEXT)}
       target="_blank"
       aria-label="Chat WhatsApp"
-      className="fixed bottom-5 left-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-2xl text-white shadow-lg shadow-green-600/30 transition hover:scale-105"
+      className="fixed bottom-5 left-5 z-40 hidden h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-2xl text-white shadow-lg shadow-green-600/30 transition hover:scale-105 md:flex"
     >
       💬
     </a>

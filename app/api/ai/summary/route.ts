@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireProfile } from "@/server/auth/session";
-import { getBranchKpi, getOpenOrders, summarize } from "@/server/db/dashboard";
-import { executiveSummary, detectRisks, aiEnabled } from "@/server/ai";
+import { getBranchKpi, getOpenOrders, getSlaSettings, summarize } from "@/server/db/dashboard";
+import { executiveSummary, detectRisks, riskBriefing, aiEnabled } from "@/server/ai";
 import { isCentralRole } from "@/types/auth";
 
 export const runtime = "nodejs";
@@ -19,11 +19,22 @@ export async function GET() {
     );
   }
 
-  const [kpi, open] = await Promise.all([getBranchKpi(), getOpenOrders(50)]);
-  const summary = await executiveSummary(summarize(kpi), kpi);
-  const risks = detectRisks(open);
+  const [kpi, open, sla] = await Promise.all([getBranchKpi(), getOpenOrders(50), getSlaSettings()]);
+  const risks = detectRisks(open, sla);
+  const highRiskCount = risks.filter((r) => r.level === "high").length;
+  const [summary, briefing] = await Promise.all([
+    executiveSummary(summarize(kpi), kpi, { highRiskCount }),
+    riskBriefing(risks),
+  ]);
 
   return NextResponse.json({
-    data: { summary: summary.text, ai: summary.ai, aiEnabled: aiEnabled(), risks },
+    data: {
+      summary: summary.text,
+      ai: summary.ai,
+      aiEnabled: aiEnabled(),
+      risks,
+      briefing: briefing.text,
+      briefingAi: briefing.ai,
+    },
   });
 }

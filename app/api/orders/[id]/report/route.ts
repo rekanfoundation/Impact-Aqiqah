@@ -9,7 +9,7 @@ export const runtime = "nodejs";
  * Akses: manager_program / admin_pusat / admin_cabang.
  */
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const profile = await requireProfile();
@@ -20,8 +20,17 @@ export async function POST(
     );
   }
 
+  // narasi hasil review (opsional) — bila kosong, generateReport draf otomatis.
+  let narrative: string | undefined;
+  try {
+    const body = (await req.json()) as { narrative?: string };
+    if (typeof body?.narrative === "string") narrative = body.narrative;
+  } catch {
+    /* body kosong/non-JSON: lanjut tanpa narasi review */
+  }
+
   const { id } = await params;
-  const result = await generateReport(id);
+  const result = await generateReport(id, { narrative });
   if (!result.ok) {
     return NextResponse.json(
       { error: { code: "REPORT_FAILED", message: result.error } },
