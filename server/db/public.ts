@@ -11,6 +11,17 @@ export async function getPublicPackages(): Promise<Service[]> {
   return ((data as Service[] | null) ?? []) as Service[];
 }
 
+/** Satu paket publik by slug (untuk halaman /{slug}). Null bila tak ada/nonaktif. */
+export async function getServiceBySlug(slug: string): Promise<Service | null> {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.rpc("get_public_package", { p_slug: slug });
+    return (data as Service | null) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function splitPackages(all: Service[]) {
   return {
     kambing: all.filter((s) => s.type === "aqiqah"),

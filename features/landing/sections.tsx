@@ -342,19 +342,20 @@ export function Testimonials() {
   );
 }
 
-const FAQS = [
+const FAQS_FALLBACK = [
   { q: "Apakah kambingnya sehat dan layak?", a: "Ya. Seluruh kambing diperiksa kesehatannya, cukup umur, dan memenuhi syarat sah aqiqah sesuai syariat." },
   { q: "Bagaimana proses penyembelihannya?", a: "Penyembelihan dilakukan oleh tim ahli yang memahami syariat Islam dan diawasi untuk memastikan keabsahannya." },
   { q: "Apakah ada dokumentasi prosesnya?", a: "Ya, Anda menerima laporan dokumentasi (foto/video) dari proses penyembelihan hingga distribusi via link laporan." },
-  { q: "Berapa lama waktu pemesanan?", a: "Disarankan memesan minimal H-1 agar penjadwalan, penyembelihan, dan pengolahan berjalan optimal." },
+  { q: "Berapa lama waktu pemesanan?", a: "Disarankan memesan minimal H-3 agar penjadwalan, penyembelihan, dan pengolahan berjalan optimal." },
 ];
 
-export function Faq() {
+export function Faq({ items }: { items?: { q: string; a: string }[] }) {
+  const list = items && items.length > 0 ? items : FAQS_FALLBACK;
   return (
     <section id="faq" className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
       <SectionTitle title="Pertanyaan yang Sering Ditanyakan" />
       <div className="space-y-3">
-        {FAQS.map((f) => (
+        {list.map((f) => (
           <details key={f.q} className="group rounded-xl border border-neutral-200 bg-white p-4">
             <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-neutral-800">
               {f.q}

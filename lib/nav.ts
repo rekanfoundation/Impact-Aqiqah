@@ -91,6 +91,12 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["manager_program"],
   },
   {
+    href: "/cms",
+    label: "Halaman & FAQ",
+    glyph: "📄",
+    roles: ["manager_program"],
+  },
+  {
     href: "/ai-assistant",
     label: "AI Assistant",
     glyph: "🤖",

@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
 // Route publik (tanpa login). Laporan peserta: /r/{token} (docs/11, docs/15).
-const PUBLIC_PATHS = ["/", "/login", "/daftar", "/checkout"];
+const PUBLIC_PATHS = ["/", "/login", "/daftar", "/checkout", "/sitemap", "/sitemap.xml", "/robots.txt"];
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) return true;
@@ -12,6 +12,42 @@ function isPublicPath(pathname: string): boolean {
   if (pathname.startsWith("/checkout")) return true; // checkout guest + halaman sukses
   if (pathname.startsWith("/api/chat")) return true; // chatbot publik (docs/26)
   return false;
+}
+
+// Allowlist slug halaman CMS publik (docs/27) — di-cache agar tak query tiap request.
+// Fail-safe: bila gagal/expired, route terproteksi tetap default-deny (PUBLIC_PATHS).
+type SupabaseClient = ReturnType<typeof createServerClient>;
+let cachedSlugs: Set<string> | null = null;
+let cachedAt = 0;
+const SLUG_TTL = 60_000;
+
+async function isPublicCmsSlug(
+  supabase: SupabaseClient,
+  pathname: string,
+): Promise<boolean> {
+  // hanya path satu segmen (mis. /proses), bukan /a/b
+  const segs = pathname.split("/").filter(Boolean);
+  if (segs.length !== 1) return false;
+  const slug = segs[0];
+
+  if (!cachedSlugs || Date.now() - cachedAt > SLUG_TTL) {
+    try {
+      // Slug publik = halaman CMS (docs/27) + paket/program (docs/28).
+      const [pages, pkgs] = await Promise.all([
+        supabase.rpc("get_cms_pages"),
+        supabase.rpc("get_public_packages"),
+      ]);
+      const set = new Set<string>();
+      for (const r of (pages.data ?? []) as { slug: string }[]) if (r.slug) set.add(r.slug);
+      for (const r of (pkgs.data ?? []) as { slug: string }[]) if (r.slug) set.add(r.slug);
+      cachedSlugs = set;
+      cachedAt = Date.now();
+    } catch {
+      // biarkan cache lama (bila ada); jangan buka akses bila tak yakin
+      if (!cachedSlugs) return false;
+    }
+  }
+  return cachedSlugs.has(slug);
 }
 
 /**
@@ -60,7 +96,8 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Belum login & mengakses route terproteksi -> ke /login
-  if (!user && !isPublicPath(pathname)) {
+  // (halaman CMS publik docs/27 diizinkan via allowlist slug ter-cache)
+  if (!user && !isPublicPath(pathname) && !(await isPublicCmsSlug(supabase, pathname))) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("redirect", pathname);

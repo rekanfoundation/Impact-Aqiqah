@@ -2,7 +2,11 @@ import { z } from "zod";
 
 // Skema validasi input (docs/16 §12) — dipakai di Server Actions.
 
-const uuid = z.string().uuid("ID tidak valid");
+// ID berasal dari DB (tepercaya). Pakai pola UUID permisif — seed memakai UUID
+// non-RFC (mis. b0000001-0000-0000-0000-...) yang ditolak z.uuid() Zod v4.
+const uuid = z
+  .string()
+  .regex(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/, "ID tidak valid");
 
 export const orderItemSchema = z.object({
   service_id: uuid,
@@ -76,8 +80,11 @@ export const serviceSchema = z.object({
   id: uuid.optional(),
   type: z.enum(["aqiqah", "qurban", "sedekah_daging", "nasi_box"]),
   name: z.string().trim().min(3, "Nama paket wajib"),
+  slug: z.string().trim().optional(), // auto dari nama bila kosong
   description: z.string().trim().optional(),
-  price: z.coerce.number().min(0, "Harga tidak valid"),
+  price: z.coerce.number().min(0, "Harga jual tidak valid"), // harga jual
+  vendor_price: z.coerce.number().min(0, "Harga vendor tidak valid").default(0),
+  sort_order: z.coerce.number().int().min(0).default(0),
   is_active: z.coerce.boolean().default(true),
   // rincian kambing (opsional)
   harga_kambing: z.coerce.number().min(0).optional(),

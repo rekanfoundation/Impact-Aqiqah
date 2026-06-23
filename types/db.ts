@@ -57,8 +57,14 @@ export interface Service {
   id: string;
   type: ServiceType;
   name: string;
+  /** Slug SEO publik (docs/28). Opsional pada data publik lama. */
+  slug?: string | null;
   description: string | null;
-  price: number;
+  price: number; // harga jual
+  /** Internal (admin only) — TIDAK diekspos ke publik. */
+  vendor_price?: number;
+  margin?: number;
+  sort_order?: number;
   meta: ServiceMeta;
   is_active: boolean;
 }
