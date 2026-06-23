@@ -17,6 +17,7 @@ const RULES =
   "- Jawab HANYA berdasarkan KONTEKS di bawah atau pengetahuan umum yang aman tentang aqiqah/qurban. JANGAN mengarang fakta, harga, atau kebijakan.\n" +
   `- Jika informasi tidak ada di KONTEKS, atau Anda tidak yakin, balas PERSIS token: ${ESCALATE_MARKER}\n` +
   `- Untuk hal sensitif, keluhan, permintaan ubah data, atau pertanyaan spesifik tentang order tertentu, balas PERSIS token: ${ESCALATE_MARKER}\n` +
+  "- PEMBAYARAN & PEMESANAN: arahkan pengguna menyelesaikan pemesanan dan pembayaran HANYA melalui sistem di website (tombol Order/Pesan → checkout). JANGAN pernah memproses pesanan, menghitung total tagihan untuk dibayar, atau menerima pembayaran lewat WhatsApp/transfer manual. WhatsApp hanya untuk bantuan/konsultasi, bukan transaksi.\n" +
   "- Jangan gunakan markdown tebal (tanda bintang ganda).";
 
 function buildKnowledgeContext(
