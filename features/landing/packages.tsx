@@ -3,8 +3,9 @@ import { formatIDR } from "@/lib/utils";
 import { hasilSummary, nasiBoxItems } from "@/lib/packages";
 import type { Service } from "@/types/db";
 
-function buyHref(id: string) {
-  return `/checkout?paket=${id}`;
+function buyHref(p: Service) {
+  // Pakai slug SEO-friendly (fallback id untuk data lama).
+  return `/checkout?paket=${p.slug || p.id}`;
 }
 
 const SectionTitle = ({ title, subtitle }: { title: string; subtitle?: string }) => (
@@ -57,7 +58,7 @@ export function KambingPackages({ packages }: { packages: Service[] }) {
                 )}
               </ul>
               <Link
-                href={buyHref(p.id)}
+                href={buyHref(p)}
                 className={`mt-6 rounded-lg px-4 py-2.5 text-center text-sm font-semibold ${
                   popular
                     ? "bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)]"
@@ -117,7 +118,7 @@ export function NasiBoxPackages({ packages }: { packages: Service[] }) {
                   ))}
                 </ul>
                 <Link
-                  href={buyHref(p.id)}
+                  href={buyHref(p)}
                   className="mt-3 rounded-lg border border-neutral-300 px-3 py-1.5 text-center text-xs font-semibold text-neutral-800 hover:bg-neutral-50"
                 >
                   Pilih

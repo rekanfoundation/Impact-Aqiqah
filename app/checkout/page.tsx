@@ -12,6 +12,10 @@ export default async function CheckoutPage({
   const { paket } = await searchParams;
   const all = await getPublicPackages();
   const { kambing, nasiBox } = splitPackages(all);
+  // paket bisa berupa slug (SEO) atau id — resolusikan ke id untuk preselect.
+  const preselectId = paket
+    ? (all.find((s) => s.slug === paket || s.id === paket)?.id ?? paket)
+    : undefined;
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
@@ -34,7 +38,7 @@ export default async function CheckoutPage({
           Paket belum tersedia. Silakan hubungi kami via WhatsApp.
         </p>
       ) : (
-        <CheckoutForm kambing={kambing} nasiBox={nasiBox} preselect={paket} />
+        <CheckoutForm kambing={kambing} nasiBox={nasiBox} preselect={preselectId} />
       )}
     </main>
   );

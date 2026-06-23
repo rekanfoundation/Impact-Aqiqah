@@ -35,6 +35,9 @@ export function ServiceForm({ service }: { service?: Service }) {
   const [items, setItems] = useState<string[]>(
     Array.isArray(service?.meta?.items) ? (service!.meta.items as string[]) : [""],
   );
+  const [vendor, setVendor] = useState<number>(service?.vendor_price ?? 0);
+  const [sell, setSell] = useState<number>(service?.price ?? 0);
+  const margin = Math.max(0, sell - vendor);
 
   const k = service?.meta ?? {};
   const h = k.hasil ?? {};
@@ -61,8 +64,8 @@ export function ServiceForm({ service }: { service?: Service }) {
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-neutral-700">Harga Jual (Rp) *</span>
-          <input name="price" type="number" min={0} defaultValue={service?.price ?? 0} className={input} required />
+          <span className="font-medium text-neutral-700">Urutan Tampil</span>
+          <input name="sort_order" type="number" min={0} defaultValue={service?.sort_order ?? 0} className={input} />
         </label>
       </div>
 
@@ -70,6 +73,58 @@ export function ServiceForm({ service }: { service?: Service }) {
         <span className="font-medium text-neutral-700">Nama Paket *</span>
         <input name="name" defaultValue={service?.name ?? ""} className={input} required />
       </label>
+
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium text-neutral-700">Slug (URL publik)</span>
+        <input
+          name="slug"
+          defaultValue={service?.slug ?? ""}
+          placeholder="otomatis dari nama bila kosong (mis. aqiqah-ekonomi)"
+          className={input}
+        />
+        <span className="text-xs text-neutral-400">
+          Hanya huruf kecil, angka, dan tanda hubung. Bisa diubah; harus unik.
+        </span>
+      </label>
+
+      {/* Harga: vendor + jual → margin otomatis */}
+      <fieldset className="rounded-lg border border-neutral-200 p-3">
+        <legend className="px-1 text-sm font-semibold text-neutral-700">Harga</legend>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-neutral-600">Harga Vendor (Rp)</span>
+            <input
+              name="vendor_price"
+              type="number"
+              min={0}
+              value={vendor}
+              onChange={(e) => setVendor(Number(e.target.value) || 0)}
+              className={input}
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-neutral-600">Harga Jual (Rp) *</span>
+            <input
+              name="price"
+              type="number"
+              min={0}
+              value={sell}
+              onChange={(e) => setSell(Number(e.target.value) || 0)}
+              className={input}
+              required
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-neutral-600">Margin (otomatis)</span>
+            <input
+              type="text"
+              value={`Rp${margin.toLocaleString("id-ID")}`}
+              readOnly
+              className={`${input} bg-neutral-100 text-neutral-600`}
+            />
+          </label>
+        </div>
+      </fieldset>
 
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium text-neutral-700">Deskripsi</span>

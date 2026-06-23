@@ -65,6 +65,11 @@ function ServiceCard({ s }: { s: Service }) {
         {!s.is_active && <Badge label="Nonaktif" tone="neutral" />}
       </div>
       <div className="text-lg font-bold text-[var(--color-primary)]">{formatIDR(s.price)}</div>
+      <div className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-neutral-400">
+        {s.slug && <span>/{s.slug}</span>}
+        {!!s.vendor_price && <span>vendor {formatIDR(s.vendor_price)}</span>}
+        {!!s.margin && <span>margin {formatIDR(s.margin)}</span>}
+      </div>
       {s.description && <p className="mt-1 text-sm text-neutral-500">{s.description}</p>}
 
       {hasil && <p className="mt-2 text-xs text-neutral-600">Hasil: {hasil}</p>}

@@ -3,6 +3,17 @@ export function cn(...classes: Array<string | false | null | undefined>): string
   return classes.filter(Boolean).join(" ");
 }
 
+/** Ubah teks → slug SEO-friendly (lowercase, alnum + dash). */
+export function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 /** Format mata uang Rupiah. */
 export function formatIDR(value: number | null | undefined): string {
   if (value == null) return "—";

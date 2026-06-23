@@ -32,9 +32,15 @@ async function isPublicCmsSlug(
 
   if (!cachedSlugs || Date.now() - cachedAt > SLUG_TTL) {
     try {
-      const { data } = await supabase.rpc("get_cms_pages");
-      const rows = (data ?? []) as { slug: string }[];
-      cachedSlugs = new Set(rows.map((r) => r.slug));
+      // Slug publik = halaman CMS (docs/27) + paket/program (docs/28).
+      const [pages, pkgs] = await Promise.all([
+        supabase.rpc("get_cms_pages"),
+        supabase.rpc("get_public_packages"),
+      ]);
+      const set = new Set<string>();
+      for (const r of (pages.data ?? []) as { slug: string }[]) if (r.slug) set.add(r.slug);
+      for (const r of (pkgs.data ?? []) as { slug: string }[]) if (r.slug) set.add(r.slug);
+      cachedSlugs = set;
       cachedAt = Date.now();
     } catch {
       // biarkan cache lama (bila ada); jangan buka akses bila tak yakin
